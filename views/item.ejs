@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title><% if (null != item) { %> <%= item.item_name %> <% } %> | swaplat</title>
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:site" content="@swaplattr" />
+	<meta name="twitter:creator" content="@swaplattr" />
+	<meta name="twitter:title" content="<% if (null != item) { %><%= item.item_name %><% } %>" />
+	<meta name="twitter:description" content="<% if (null != item) { %><%= item.item_desc %><% } %>" />
+	<meta name="twitter:image" content="<% if (null != item) { %><%= item.item_photo %><% } %>" />
+	
+	<meta property="og:title" content="<% if (null != item) { %><%= item.item_name %><% } %>" />
+	<meta property="og:type" content="article" />
+	<meta property="og:image" content="<% if (null != item) { %><%= item.item_photo %><% } %>" />
+	<meta property="og:url" content="https://swaplat.com/listing/<% if (null != item) { %><%= item.item_id %><% } %>" />
+	<meta property="og:description" content="<% if (null != item) { %><%= item.item_desc %><% } %>" />
+
+<meta charset="utf-8" />
+<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+<meta name="description" content="Swaplat, kullanıcılarının değiş tokuş usülü ile eşya veya hizmet paylaşımında bulunabildiği online bir takas platformudur.">
+
+<link rel="apple-touch-icon" sizes="76x76" href="../apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="manifest" href="../manifest.json">
+<link rel="mask-icon" href="../safari-pinned-tab.svg" color="#5bbad5">
+<meta name="theme-color" content="#ffffff">	
+<link rel="stylesheet" href="../css/styles.min.css"/>
+<script src='https://www.google.com/recaptcha/api.js?hl=tr&&onload=CaptchaCallback&render=explicit' async defer></script> 
+<script src="../js/vendor/js.cookie.min.js"></script>	
+<script src="../js/vendor/jquery-1.11.1.min.js"></script>
+<script src="../js/vendor/url.min.js"></script>
+<script src="../js/analytics.js"></script>
+</head>
+<body>
+<%- include('topbar.ejs') %>
+	<div class="modal" id="modal-sendmessage">
+		<div class="modal-container" id="sendmessage-container">
+			<span class="modal-close"></span>
+			<form id="itemmain-sendmessage-form">
+				<div id="sendmessage-message-container">
+					<textarea id='sendmessage-message' name='message' placeholder='Mesajınızı buraya yazabilirsiniz' required></textarea>
+					<label for="message" id='sendmessage-message-label'>Mesajınızı buraya yazabilirsiniz</label>			
+				</div>
+				<div id="sendmessage-button-container">
+					<input type="submit" class="modal-button" id="btn-modal-sendmessage" value="Gönder">
+				</div>		
+			</form>		
+		</div>
+	</div>
+	<div class="modal" id="modal-sendswapoffer">
+		<div class="modal-container" id="sendswapoffer-container">
+			<span class="modal-close"></span>
+			<span class="sendswapoffer-info">Teklif vermek için aşağıdaki ilanlarınızdan seçim yapın. </span> <span class="sendswapoffer-tip">İpucu: Birden fazla ilan seçebilirsiniz</span>
+			<div class="owneditems-container" id="sendswapoffer-owneditems-container"></div>	
+			<div id="sendswapoffer-button-container">
+					<input type="submit" class="modal-button" id="btn-modal-sendswapoffer" value="Teklifi Tamamla">
+				</div>		
+			</div>
+	</div>
+	<div class="modal" id="modal-showhqimage">
+		<div class="modal-container" id="showhqimage-container">
+			<span class="modal-close"></span>
+		</div>
+	</div>
+	<div class='content'>
+	<form id="itemimage-edit-form" enctype="multipart/form-data" method="post" accept-charset="utf-8">	
+		<div class='itemmain-container'>
+			<div class='greenarea-container itemcategorymenu-container'>
+			<span id='itemmain-categorymenu' data-categoryid='<% if (null != item) { %><%= item.item_category %><% } %>'><% if (null != item) { %> <%= item.category_name %> <% } %></span> >>
+			<span id='itemmain-categoryname'><% if (null != item) { %> <%= item.item_name %> <% } %></span>
+			</div>	
+			<div class='greenarea-container itemmain-itemimage-container'>
+				<img class="itemimage" id="itemimage" src="<% if (null != item) { %> <%= item.item_photo %> <% } %>">
+				<div class="itemimage-rotate-container">
+					<img id="itemimage-rotateright" class="itemimage-rotate" style="width:75px;height:75px;" src="../img/rotateright.png" alt="Sağa çevir" title="Sağa çevir">
+					<img id="itemimage-rotate180" class="itemimage-rotate" style="width:75px;height:75px;" src="../img/rotate180.png" alt="Başaşağı döndür" title="Başaşağı döndür">
+					<img id="itemimage-rotateleft" class="itemimage-rotate" style="width:75px;height:75px;" src="../img/rotateleft.png" alt="Sola çevir" title="Sola çevir">
+				</div>
+			</div>
+			<div class='greenarea-container itemmain-iteminfo-container'>			
+				<div class='itemtitle-container'>
+					<h3 id="itemtitle"><% if (null != item) { %> <%= item.item_name %> <% } %></h3>
+					<input type='text' id='itemmain_item_name' name='item_name' placeholder='İlan başlığı' value='<% if (null != item) { %> <%= item.item_name %> <% } %>' required>
+					<label for="item_title">İlan başlığı</label>					
+				</div>	
+				<div class='itemdescription-container'>
+					<p id="itemdescription"><% if (null != item) { %> <%= item.item_desc %> <% } %></p>
+					<textarea id='itemmain_item_desc' name='item_desc' placeholder='İlan açıklaması'><% if (null != item) { %> <%= item.item_desc %> <% } %></textarea>
+					<label for="item_desc">İlan açıklaması</label>					
+				</div>
+				<div class='itemdate-container'>
+					<p id="itemdate-span">İlan <span id="itemdate"><% if (null != item) { %> <%= item.item_date %> <% } %></span> eklenmiş</p>
+					<select id='itemmain_item_category' name='item_category' required>
+						<option value="" disabled selected>İlan kategorisi</option>
+						<% if (null != categories) { 
+							for (var i=1; i<categories.length; i++) { %>
+								<option value="<%=categories[i].category_id%>"><%=categories[i].category_name%></option>
+							<% }
+						 } %>
+					</select>
+				</div>
+				<% if (null != item && user_id != item.owner.u_id) { %>
+					<input type="button" id="btn-makeswapoffer" value="Teklif Ver">
+				<% } %>	
+			</div>	
+			<div class='greenarea-container itemmain-userinfo-container'>
+				<div class='userimage-container' id='itemmain-userimage-container' style="background-image: url(' <% if (null != item) { %> <%= item.owner.u_photo %> <% } %> ')"></div>				
+				<div class='username-container'>
+					<a id="itemmain-username-link" href="../users/<% if (null != item) { %><%= item.owner.u_id %><% } %>"><h4 id="itemmain-username" data-owner-id="<% if (null != item) { %> <%= item.owner.u_id %> <% } %>"><% if (null != item) { %> <%= item.owner.u_name %> <% } %></h4></a>
+				</div>	
+				<div class='userlocation-container'>
+					<h5 id="itemmain-userlocation"><% if (null != item) { %> <%= item.owner.u_location %> <% } %></h5>
+				</div>					
+				<div class='userinfo-container'>
+					<% if (null != item && null != item.owner.u_info && "" != item.owner.u_info) { %>
+						<span id="itemmain-userinfo-desc">İlan sahibinin profil notu: </span><div id="itemmain-userinfo"><% if (null != item) { %> <%= item.owner.u_info %> <% } %></div>
+					<% } %>
+				</div>
+				<% if (null != item && user_id != item.owner.u_id) { %>
+					<input type="button" id="btn-sendmessage" value="Mesaj At">
+				<% } %>					
+			</div>
+			<div class="itemmain-social-container">
+				<div id='itemmain-socialtext'>Sosyal medyada paylaş</div>
+				<img class="itemmain-social" src="../img/facebook-64.gif" id="itemmain-fb-social">
+				<img class="itemmain-social" src="../img/twitter-64.gif" id="itemmain-tw-social">
+			</div>
+			<% if (null != item && null != user_id && user_id == item.owner.u_id) { %>
+				<div class="itembuttons-container"><input type="button" id="btn-edititem" value="Düzenle"><input type="button" id="btn-deleteitem" value="Yayından Kaldır"><input type="submit" id="btn-saveitem" value="Kaydet"><span id="remove-edititem">İptal</span></div>
+			<% } %>										
+		</div>
+	</form>
+	</div>
+	<%- include('footer.ejs') %>
+	<script>
+	  window.fbAsyncInit = function() {
+		FB.init({
+		  appId            : '138792943381709',
+		  autoLogAppEvents : true,
+		  xfbml            : true,
+		  version          : 'v2.10'
+		});
+		FB.AppEvents.logPageView();
+	  };
+
+	  (function(d, s, id){
+		 var js, fjs = d.getElementsByTagName(s)[0];
+		 if (d.getElementById(id)) {return;}
+		 js = d.createElement(s); js.id = id;
+		 js.src = "//connect.facebook.net/en_US/sdk.js";
+		 fjs.parentNode.insertBefore(js, fjs);
+	   }(document, 'script', 'facebook-jssdk'));
+	</script>
+	<script>
+	
+	$(function() {
+		if(null != window.sessionStorage.dialogJSON){
+			var dialog = JSON.parse(window.sessionStorage.dialogJSON);
+			showDialogOnRedirect(dialog);
+		}		
+	});
+
+	$(function() {	
+	<%	if(null == item ){ %>
+			populateandopenDialog("modal-dialog", "Hata", "dialog-error", "Aradığınız ilan bulunamadı. Yayından kaldırılmış olabilir.", "clearandcloseDialog(event)", "Tamam", "dialog-info");
+			setTimeout(function(){
+				$(location).attr('href', '/')
+			}, 2500);
+	<%	} %>
+	}); 
+	
+	$('body').on("click","#btn-sendmessage", function(event){
+		var itemid = url(-1);
+		var userid = $('#itemmain-username').attr('data-owner-id');
+		openModalWithSendMessageMenu(event, itemid, userid);
+	});	
+	
+	$('body').on("click","#btn-makeswapoffer", function(event){		
+		var itemid = url(-1);
+		var userid = $('#itemmain-username').attr('data-owner-id');	
+		openModalWithMakeSwapOfferMenu(event, itemid, userid);
+	});		
+	
+	$('body').on("click","#btn-deleteitem", function(event){	
+		var itemid = url(-1);
+		waitAjax('.itemmain-container');		
+		populateandopenDialog("delete-dialog", "Uyarı", "dialog-warning", "İlanı yayından kaldırmak istediğinize emin misiniz?", "deleteItem("+itemid+");clearandcloseDialog();", "Kaldır", "dialog-error", "clearandcloseDialog()", "İptal", "dialog-info", event);
+	});
+	function showItemEditArea(){
+		$('#btn-edititem').css("display", "none");
+		$('#btn-saveitem').css("display", "block");
+		$('#btn-deleteitem').css("display", "none");
+		$('#remove-edititem').css("display", "block");
+		$('#itemtitle').hide();
+		$('#itemmain_item_name').show();
+		$('#itemdescription').hide();
+		$('#itemmain_item_desc').show();
+		$('#itemdate-span').hide();
+		$('#itemmain_item_category').show();
+		$('#itemmain_item_category').val($('#itemmain-categorymenu').attr('data-categoryid'));
+		$('.itemimage-rotate-container').css("display", "inline-block");	
+	}
+	$('body').on("click","#btn-edititem", function(event){	
+		showItemEditArea();
+	});
+	function hideItemEditArea(){
+		$('#btn-edititem').css("display", "block");
+		$('#btn-saveitem').css("display", "none");	
+		$('#btn-deleteitem').css("display", "block");
+		$('#remove-edititem').css("display", "none");
+		$('#itemtitle').show();
+		$('#itemmain_item_name').hide();
+		$('#itemdescription').show();
+		$('#itemmain_item_desc').hide();
+		$('#itemdate-span').show();
+		$('#itemmain_item_category').hide();
+		$('.itemimage-rotate-container').css("display", "none");
+	}	
+	$('body').on("mousedown touchstart","#remove-edititem", function(event){	
+		hideItemEditArea();
+	});
+		
+	$('body').on("submit","#itemimage-edit-form", function(event){	
+		event.preventDefault();
+		var itemid = url(-1);
+		waitAjax('.itemmain-container');
+		editItem(itemid);
+	});
+	
+	$('body').on("click","#itemimage-rotateright", function(event){	
+		var oldsrc = $('#itemimage').attr('src');
+		if(oldsrc.indexOf("a_-90") != -1){
+			var newsrc = oldsrc.replace("q_50,a_-90", "q_50");		
+		}
+		else if(oldsrc.indexOf("a_180") != -1){
+			var newsrc = oldsrc.replace("q_50,a_180", "q_50,a_-90");		
+		}
+		else if(oldsrc.indexOf("a_90") != -1){
+			var newsrc = oldsrc.replace("q_50,a_90", "q_50,a_180");
+		}
+		else{
+			var newsrc = oldsrc.replace("q_50", "q_50,a_90");
+		}				
+		$('#itemimage').attr('src', newsrc);
+	});
+	$('body').on("click","#itemimage-rotate180", function(event){	
+		var oldsrc = $('#itemimage').attr('src');
+		if(oldsrc.indexOf("a_-90") != -1){
+			var newsrc = oldsrc.replace("q_50,a_-90", "q_50,a_90");		
+		}
+		else if(oldsrc.indexOf("a_180") != -1){
+			var newsrc = oldsrc.replace("q_50,a_180", "q_50");		
+		}
+		else if(oldsrc.indexOf("a_90") != -1){
+			var newsrc = oldsrc.replace("q_50,a_90", "q_50,a_-90");
+		}
+		else{
+			var newsrc = oldsrc.replace("q_50", "q_50,a_180");
+		}				
+		$('#itemimage').attr('src', newsrc);
+	});
+	$('body').on("click","#itemimage-rotateleft", function(event){	
+		var oldsrc = $('#itemimage').attr('src');
+		if(oldsrc.indexOf("a_-90") != -1){
+			var newsrc = oldsrc.replace("q_50,a_-90", "q_50,a_180");		
+		}
+		else if(oldsrc.indexOf("a_180") != -1){
+			var newsrc = oldsrc.replace("q_50,a_180", "q_50,a_90");		
+		}
+		else if(oldsrc.indexOf("a_90") != -1){
+			var newsrc = oldsrc.replace("q_50,a_90", "q_50");
+		}
+		else{
+			var newsrc = oldsrc.replace("q_50", "q_50,a_-90");
+		}				
+		$('#itemimage').attr('src', newsrc);
+	});		
+	
+	$('body').on("click","#btn-modal-sendswapoffer", function(event){		
+		var itemlist = [];
+		
+		$(".owneditems-item-area[data-itemselected=1]").each(function(){
+			var item = {item_id: $(this).attr("data-itemid")}; 			
+ 			itemlist.push(item);
+ 		});		
+		if(null != itemlist && itemlist.length){
+			waitAjax('content');
+			var itemid = url(-1);		
+			makeTradeOffer(itemid, itemlist);
+		}
+		else{
+			populateandopenDialog("trade-dialog", "Uyarı", "dialog-warning", "İlan seçimi yapmadınız. Takas teklifi yapabilmek için en az bir ilan seçmelisiniz.", "clearandcloseDialog(event)", "Tamam", "dialog-info", null, null, null, event);		
+		}
+	});	
+	
+	$('body').on("click","#itemimage", function(event){
+		$('#showhqimage-container').css({'background-image': 'url(' + $("#itemimage").attr('src').replace('q_50', 'q_100') + ')'});
+		openModal(event, "#modal-showhqimage");
+	});	
+	
+	$('body').on("submit","#itemmain-sendmessage-form", function(event){
+		event.preventDefault();	
+		var itemid = url(-1);
+		var userid = $('#itemmain-username').attr('data-owner-id');
+		var message = $('#sendmessage-message').val();
+		sendMessage(event, itemid, userid, message, "item");
+	});		
+	
+	$('body').on("click",".owneditems-item-area", function(event){
+		if($(this).attr('data-itemselected') == 0){	
+			$(this).css({"background-color":"#cda6d2"});
+			$(this).css({"color":"#FFF"});
+			$(this).attr('data-itemselected', 1);
+		}
+		else{
+			$(this).css({"background-color":"#FFF"});
+			$(this).css({"color":"#687776"});	
+			$(this).attr('data-itemselected', 0);				
+		}
+	});		
+	
+	$(document.body).on("mousedown touchstart","#itemmain-categorymenu", function(event){
+		var categoryid = $(this).attr('data-categoryid');
+		window.sessionStorage["categoryid"] = categoryid;
+		delete sessionStorage.lastitemno;
+		$(location).attr('href', '/');		
+	});
+	
+	$(document.body).on("click","#itemmain-fb-social",function(){ 
+		FB.ui({
+		  method: 'share',
+		  href: url(),
+		}, function(response){});
+	});	
+	
+	$(document.body).on("click","#itemmain-tw-social",function(){
+		window.open('https://twitter.com/intent/tweet?text=' + "Swaplat'ta bir ilan paylaştım!" + '&url=' + url(), "Paylaş","width=680, height=250");
+	});	
+	
+	function getAllItemsOfUser(userid){
+		var getuserdata = {selected_id: userid}
+		var token = Cookies.get("swaplat-token");
+		if(null != token){
+			getuserdata["u_token"] = token;
+		}
+		var getuserdataJSON = JSON.stringify(getuserdata);	
+		$.ajax({					  
+			url: api_directory + 'getuser',
+			type: 'post',
+			datatype: 'json',
+			contentType: 'application/json; charset=utf-8',
+			data: getuserdataJSON				
+		}).done (function(data) {
+			var returnmsg = data.message;
+			var returnstatus = data.status;
+				
+			if(returnstatus === "Başarılı"){
+		
+				var user = data.response.user;
+				var items = data.response.items;
+
+				$("#sendswapoffer-owneditems-container").empty();
+			
+				if(null != items && items.length){
+					for(var i=0; i< items.length; i++){
+					$("#sendswapoffer-owneditems-container").append("<div class='owneditems-item-wrapper'><div class='owneditems-item-area' data-itemselected='0' data-itemid='"+ items[i].item_id +"'>"
+						+ "<div class='item-thumbnail' style='background: url(" + photo_directory_10 + items[i].item_photo + ");'> </div>"
+						+ "<span class='owneditems-item-title'>"+ items[i].item_name +"</span>"
+						+ "</div></div>");
+					}
+					$("#sendswapoffer-owneditems-container").prepend("<div class='arrowkeys arrowkeys-left' id='sendswapoffer-owneditems-directionkeys-left'><span class='arrowkeysicon-left'></span></div>");
+					$("#sendswapoffer-owneditems-container").append("<div class='arrowkeys arrowkeys-right' id='sendswapoffer-owneditems-directionkeys-right'><span class='arrowkeysicon-right'></span></div>");						
+				}
+				else{
+					$("#sendswapoffer-owneditems-container").prepend("<span class='messages-infomessage'>Gösterilecek ilanınız yok!</span>");			
+				}
+			}
+			else{
+				//TODO redirectry yapılacak (tam burada yoksa dialog dönüşü mü?)
+				populateandopenDialog("user-dialog", returnstatus, "dialog-error", returnmsg, "clearandcloseDialog()", "Tamam", "dialog-info");
+			}
+		}).fail (function(xhr, desc, err) {
+			console.log(xhr);
+			console.log("Details: " + desc + "\nError:" + err); 
+		});
+	}
+	
+	//Scroll inside area according its height
+	$('body').on("mousedown touchstart",".arrowkeys-left", function(event){
+		var currentpos = $(this).parent('.owneditems-container').scrollLeft();
+		var currentheight = $(this).parent('.owneditems-container').height();
+		$(this).parent('.owneditems-container').scrollLeft(currentpos - currentheight);
+	});
+	$('body').on("mousedown touchstart",".arrowkeys-right", function(event){
+		var currentpos = $(this).parent('.owneditems-container').scrollLeft();
+		var currentheight = $(this).parent('.owneditems-container').height();
+		$(this).parent('.owneditems-container').scrollLeft(currentpos + currentheight);
+	});			
+    
+    $('body').click(function(event) {
+    //Close visible modals when click anyhere outside modal (except if there is a dialog) 
+    	if(!$('.dialog').length && $('.modal:visible').length){
+			if (!$(event.target).closest('.modal-container').length || $(event.target).hasClass("modal-close")){
+				if($(event.target).closest('.modal').attr('id') == 'modal-register-signin-menu'){
+					closeModal(originalModalContent);
+				}
+				else{
+					closeModal();				
+				}
+			}
+		}
+	//Close dialog window when click anyhere outside dialog	     
+		if (!$(event.target).closest('.dialog').length){
+			clearandcloseDialog();
+		}
+	});
+	
+	//Türkçe hata mesajları
+	$('input[type="password"], input[type="text"], textarea, select')
+	.on('invalid', function(){
+		return this.setCustomValidity('Bu alan boş bırakılamaz.');
+	})
+	.on('input', function(){
+		return this.setCustomValidity('');
+	});
+      	     				
+	</script>
+	<script src="../js/constants.js"></script>	
+	<script src="../js/utility.min.js"></script>
+	<script src="../js/dialogs.min.js"></script>
+	<script src="../js/modals.min.js"></script>	   	   	   	     
+	<script src="../js/requests.min.js"></script>	
+</body>
+</html>

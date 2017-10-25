@@ -1,0 +1,51 @@
+{
+  "name": "swaplat-test",
+  "version": "0.2.5",
+  "description": "A sample Node.js app using Express 4",
+  "engines": {
+    "node": "6.10.1"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "bcrypt": "^1.0.2",
+    "body-parser": "^1.17.1",
+    "cloudinary": "^1.9.0",
+    "compression": "latest",
+    "cookie-parser": "latest",
+    "cors": "^2.8.3",
+    "crypto": "0.0.3",
+    "ejs": "latest",
+    "express": "^4.15.2",
+    "express-authentication": "^0.3.2",
+    "express-cache-controller": "latest",
+    "express-fileupload": "^0.1.4",
+    "express-formidable": "^1.0.0",
+    "express-rate-limit": "^2.8.0",
+    "express-recaptcha": "^2.1.0",
+    "express-session": "latest",
+    "helmet": "^3.5.0",
+    "jsonwebtoken": "^7.4.0",
+    "moment": "^2.18.1",
+    "morgan": "^1.8.1",
+    "mysql": ">=2.5.0",
+    "nodemailer": "^4.0.1",
+    "passport": "^0.3.2",
+    "passport-auth0": "^0.6.0",
+    "request": "^2.81.0",
+    "sql-injection": "0.0.5",
+    "util": "^0.10.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/heroku/node-js-getting-started"
+  },
+  "keywords": [
+    "node",
+    "heroku",
+    "express"
+  ],
+  "license": "MIT"
+}

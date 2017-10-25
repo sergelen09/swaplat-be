@@ -1,0 +1,184 @@
+<div class="modal" id="modal-register-signin-menu">
+	<div class="modal-container" id="modal-register-signin-menu-container">
+		<span class="modal-close"></span>
+		<div id="modal-navbar">
+			<ul class="modal-nav">
+				<li class="modal-item" id="modal-item-register" onclick="makeModalRegisterTabActive()">
+					Kayıt							
+				</li>
+				<li class="modal-item" id="modal-item-signin" onclick="makeModalSigninTabActive()">
+					Giriş
+				</li>
+			</ul>	
+		</div>
+		<div id="register-container">
+			<form id="register-form">
+				<div class="modal-input">
+					<input type='text' id='register-username' name='username' placeholder='Kullanıcı adı' required>
+					<label for="username">Kullanıcı adı</label>			
+				</div>
+				<div class="modal-input">
+					<input type='email' id='register-email' name='email' placeholder='E-mail adresi' required>
+					<label for="email">E-mail adresi</label>			
+				</div>
+				<div class="modal-input">
+					<input type='password' id='register-password' name='password' placeholder='Şifre' required >
+					<label for="password">Şifre</label>			
+				</div>					
+				<div class="modal-input">														
+					<div id="register-accept-container">
+						<input type="checkbox" id="register-accept-terms">
+						<div class="checkbox-label"><a href="../siteinfo?siteinfo=contract">Kullanıcı Sözleşmesi</a>ni ve <a href="../siteinfo?siteinfo=privacy">Gizlilik Politikası</a>nı kabul ediyorum.</div>
+<!-- 
+						<input type="checkbox" id="register-accept-newsletter">
+						<span class="checkbox-label">Swaplat tarafından tarafıma e-bülten gönderilmesine izin veriyorum.</span>	
+ -->					
+					</div>					
+				</div>
+				<div class="modal-input">														
+				<div id="register-recaptcha" class="g-recaptcha modal-recaptcha"></div>				
+				</div>
+				<div class="modal-input">										
+					<input type="submit" class="modal-button" id="btn-register" value="Kayıt Ol">
+				</div>
+			</form>					
+		</div>			
+		<div id="signin-container">
+			<form id="signin-form">
+				<div class="modal-input">
+					<input type='text' id='signin-username' name='username' placeholder='Kullanıcı adı ya da e-mail adresiniz' required>
+					<label for="username">Kullanıcı adı ya da e-mail adresiniz</label>			
+				</div>
+				<div class="modal-input">
+					<input type='password' id='signin-password' name='password' placeholder='Şifreniz' required >
+					<label for="password">Şifreniz</label>			
+				</div>
+				<div class="modal-input">
+					<input type="checkbox" id="signin-rememberme"><div class="checkbox-label">Beni hatırla</div>
+				</div>
+				<div id="signin-recaptcha" class="g-recaptcha modal-recaptcha"></div>								
+				<div class="modal-input">
+					<input type="submit" class="modal-button" id="btn-signin" value="Giriş Yap">
+				</div>
+				<div class="modal-input">				
+					<p id="signin-forgotpassword-container">
+						<a href="../resetpassword">Şifremi unuttum</a>
+					</p>
+				</div>	
+			</form>											
+		</div>				
+	</div>
+</div>
+
+<nav class="top-bar">
+	<a href="/"><div id="logo"></div></a>
+	
+	<ul class="menu-nav" id="public-menu">	
+		<li class="menu-item" id="menu-register" onclick='openModalWithRegisterTab(event)'>
+			Kayıt Ol							
+		</li>
+		<li class="menu-item" id="menu-signin" onclick="openModalWithSigninTab(event)">
+			Giriş Yap
+		</li>							
+	</ul>
+	<ul class="menu-nav" id="user-menu">	
+		<li class="menu-item" >
+			<span id="menu-userphoto"></span>
+			<span id="menu-username"></span>		
+			<ul id="menu-dropdown">
+				<a class="menu-dropdown-link" id="menu-dropdown-profile" href="../user"><li class="menu-dropdown-element">Profilim</li></a>
+				<a class="menu-dropdown-link" id="menu-dropdown-messageinbox" href="../messageinbox"><li class="menu-dropdown-element">Mesajlar <span id="menu-dropdown-messagecount"></span></li></a>
+				<a class="menu-dropdown-link" id="menu-dropdown-offerinbox" href="../offerinbox"><li class="menu-dropdown-element">Teklifler <span id="menu-dropdown-tradeoffercount"></span></li></a>
+				<a class="menu-dropdown-link" id="menu-dropdown-logout" href="/" onclick="signOut()"><li class="menu-dropdown-element">Çıkış Yap</li></a>
+			</ul>
+			<span id="menu-alert-count"></span>
+		</li>						
+	</ul>	
+	
+	<div id="main-search-container">
+		<div id="search-container">
+			<input type="text" id="search-top" placeholder="Ara...">
+		</div>
+		<div class="city-search-container" id="topbar-city-search-container">
+			<select class="city-search" id="topbar-city-search">
+				<option value="0" selected>Şehir</option>
+			</select>
+		</div>
+		<div id="btn-search-container">	
+			<input type="button" id="btn-search" value="Ara">
+		</div>			
+	</div>			
+</nav>
+
+<script>
+	var registerwidget;
+    var signinwidget;
+    var CaptchaCallback = function() {
+        registerwidget = grecaptcha.render('register-recaptcha', {'sitekey' : '6LdbQiQUAAAAABbo5Xl19ZkDiLT7sI8zmGcFvIbF'});
+        signinwidget = grecaptcha.render('signin-recaptcha', {'sitekey' : '6LfhliQUAAAAAHrMshiD-LWAQUCBDSarzZlTxUet'});
+    };
+    
+	$(function() {
+		showMenuAccordingLoggingIn();
+		populateCitySelect('#topbar-city-search');
+	});
+	
+	$('body').on("submit","#signin-form", function(event){
+		event.preventDefault();	
+		signIn(event);
+	});	
+	
+	$('body').on("submit","#register-form", function(event){
+		event.preventDefault();	
+		signUp(event);
+	});				
+	
+	$('#btn-search').click(function(event) {
+		var keyword, cityid, categoryid;
+
+		if($('#topbar-city-search').val() != 0){
+			cityid = $('#topbar-city-search').val();
+			window.sessionStorage["cityid"] = cityid;
+		}
+		else{
+			delete sessionStorage.cityid;
+		}
+				
+		if(null != window.sessionStorage["cityid"]){
+			cityid = window.sessionStorage["cityid"];
+		}			
+		if(null != window.sessionStorage["categoryid"]){
+			categoryid = window.sessionStorage["categoryid"];
+		}
+		
+		if($('#search-top').val().trim().length){
+			keyword = $('#search-top').val();
+			window.sessionStorage["keyword"] = keyword;
+		}
+		
+		if(null != keyword || null != cityid){
+			delete sessionStorage.allitems;
+			delete sessionStorage.lastitemno;
+			var origin = url(1);
+			if(origin != "index" && origin != ""){
+				$(location).attr('href', '/');
+			}
+			else{
+				searchItems(keyword, cityid, categoryid);
+				if(null != cityid){
+					$(".city-active").removeClass("city-active");
+					if(cityid == "34" || cityid == "35" || cityid == "6"){
+						$('.city[data-cityid="'+cityid+'"]').addClass("city-active");
+					}
+					else{
+						$('#leftbar-city-search').val(cityid);
+						$('#leftbar-city-search-mobile').val(cityid);
+					}
+				}				
+			}
+		}
+		else{
+			populateandopenDialog("search-dialog", "Uyarı", "dialog-warning", "Arama yapabilmek için filtre seçimi yapmalısınız", "clearandcloseDialog(event)", "Tamam", "dialog-info", null, null, null, event);
+		}	
+	});	
+</script>
